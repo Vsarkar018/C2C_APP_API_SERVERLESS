@@ -1,1 +1,2 @@
-export * from './handlers/UserHandler'
+import "reflect-metadata";
+export * from "./handlers/UserHandler";
