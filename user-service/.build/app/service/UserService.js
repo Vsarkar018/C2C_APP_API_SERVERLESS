@@ -22,16 +22,38 @@ exports.UserService = void 0;
 const response_1 = require("../utility/response");
 const UserRepository_1 = require("../repository/UserRepository");
 const tsyringe_1 = require("tsyringe");
+const class_transformer_1 = require("class-transformer");
+const SignupInput_1 = require("../models/dto/SignupInput");
+const error_1 = require("../utility/error");
+const http_status_codes_1 = require("http-status-codes");
+const password_1 = require("../utility/password");
 let UserService = exports.UserService = class UserService {
     constructor(repository) {
         this.repository = repository;
     }
     CreateUser(event) {
         return __awaiter(this, void 0, void 0, function* () {
-            const body = event.body;
-            console.log(body);
-            this.repository.CreateUserOperations();
-            return (0, response_1.SuccessResponse)({ message: "response from create user" });
+            try {
+                const input = (0, class_transformer_1.plainToClass)(SignupInput_1.SignupInput, event.body);
+                const error = yield (0, error_1.AppValidationError)(input);
+                if (error) {
+                    return (0, response_1.ErrorResponse)(http_status_codes_1.StatusCodes.NOT_FOUND, error);
+                }
+                const salt = yield (0, password_1.GenSalt)();
+                const hashPassword = yield (0, password_1.GetHashedPassowrd)(input.password, salt);
+                const data = yield this.repository.createAccount({
+                    email: input.email,
+                    password: hashPassword,
+                    phone: input.phone,
+                    salt: salt,
+                    user_type: "Buyer",
+                });
+                return (0, response_1.SuccessResponse)(data);
+            }
+            catch (error) {
+                console.log(error);
+                return (0, response_1.ErrorResponse)(http_status_codes_1.StatusCodes.INTERNAL_SERVER_ERROR, error);
+            }
         });
     }
     UserLogin(event) {

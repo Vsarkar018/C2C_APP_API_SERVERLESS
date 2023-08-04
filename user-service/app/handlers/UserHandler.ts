@@ -11,6 +11,9 @@ const service = container.resolve(UserService);
 export const Signup = middy((event: APIGatewayProxyEventV2) => {
   return service.CreateUser(event);
 }).use(jsonBodyParser());
+
+
+
 export const Login = async (event: APIGatewayProxyEventV2) => {
   return service.UserLogin(event);
 };
