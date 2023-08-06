@@ -20,6 +20,7 @@ import {
 } from "../utility/Notification";
 import { VerificationInput } from "../models/dto/UpdateInput";
 import { TimeDifference } from "../DateHelper";
+import { ProfileInput } from "../models/dto/AddressInput";
 
 @autoInjectable()
 export class UserService {
@@ -150,13 +151,57 @@ export class UserService {
 
   //Profile Section
   async CreateProfile(event: APIGatewayProxyEventV2) {
-    return SuccessResponse({ message: "response from the Create profile" });
+    try {
+      const token = event.headers.authorization;
+      const payload = await VerifyToken(token);
+      if (!payload)
+        return ErrorResponse(StatusCodes.FORBIDDEN, "authorization Failed");
+      const input = plainToClass(ProfileInput, event.body);
+      const error = await AppValidationError(input);
+      if (error) return ErrorResponse(StatusCodes.BAD_REQUEST, error);
+
+      const result = await this.repository.createProfile(
+        payload.user_id,
+        input
+      );
+      return SuccessResponse({ message: "User Profile created successfully" });
+    } catch (error) {
+      console.log(error);
+      return ErrorResponse(StatusCodes.INTERNAL_SERVER_ERROR, error);
+    }
   }
   async EditProfile(event: APIGatewayProxyEventV2) {
-    return SuccessResponse({ message: "response from the Edit profile" });
+    try {
+      const token = event.headers.authorization;
+      const payload = await VerifyToken(token);
+      if (!payload)
+        return ErrorResponse(StatusCodes.FORBIDDEN, "authorization Failed");
+      const input = plainToClass(ProfileInput, event.body);
+      const error = await AppValidationError(input);
+      if (error) return ErrorResponse(StatusCodes.BAD_REQUEST, error);
+
+      await this.repository.editProfile(payload.user_id, input);
+      return SuccessResponse({ message: "User Profile Updated  successfully" });
+    } catch (error) {
+      console.log(error);
+      return ErrorResponse(StatusCodes.INTERNAL_SERVER_ERROR, error);
+    }
   }
   async GetProfile(event: APIGatewayProxyEventV2) {
-    return SuccessResponse({ message: "response from the Get profile" });
+    try {
+      const token = event.headers.authorization;
+      const payload = await VerifyToken(token);
+      if (!payload) {
+        return ErrorResponse(StatusCodes.FORBIDDEN, "authorization Failed");
+      }
+      const result = await this.repository.getUserProfile(payload.user_id);
+      console.log(result);
+
+      return SuccessResponse(result);
+    } catch (error) {
+      console.log(error);
+      return ErrorResponse(StatusCodes.INTERNAL_SERVER_ERROR, error);
+    }
   }
 
   //Cart Section

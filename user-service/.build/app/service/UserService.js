@@ -31,6 +31,7 @@ const LoginInput_1 = require("../models/dto/LoginInput");
 const Notification_1 = require("../utility/Notification");
 const UpdateInput_1 = require("../models/dto/UpdateInput");
 const DateHelper_1 = require("../DateHelper");
+const AddressInput_1 = require("../models/dto/AddressInput");
 let UserService = exports.UserService = class UserService {
     constructor(repository) {
         this.repository = repository;
@@ -143,17 +144,60 @@ let UserService = exports.UserService = class UserService {
     //Profile Section
     CreateProfile(event) {
         return __awaiter(this, void 0, void 0, function* () {
-            return (0, response_1.SuccessResponse)({ message: "response from the Create profile" });
+            try {
+                const token = event.headers.authorization;
+                const payload = yield (0, password_1.VerifyToken)(token);
+                if (!payload)
+                    return (0, response_1.ErrorResponse)(http_status_codes_1.StatusCodes.FORBIDDEN, "authorization Failed");
+                const input = (0, class_transformer_1.plainToClass)(AddressInput_1.ProfileInput, event.body);
+                const error = yield (0, error_1.AppValidationError)(input);
+                if (error)
+                    return (0, response_1.ErrorResponse)(http_status_codes_1.StatusCodes.BAD_REQUEST, error);
+                const result = yield this.repository.createProfile(payload.user_id, input);
+                return (0, response_1.SuccessResponse)({ message: "User Profile created successfully" });
+            }
+            catch (error) {
+                console.log(error);
+                return (0, response_1.ErrorResponse)(http_status_codes_1.StatusCodes.INTERNAL_SERVER_ERROR, error);
+            }
         });
     }
     EditProfile(event) {
         return __awaiter(this, void 0, void 0, function* () {
-            return (0, response_1.SuccessResponse)({ message: "response from the Edit profile" });
+            try {
+                const token = event.headers.authorization;
+                const payload = yield (0, password_1.VerifyToken)(token);
+                if (!payload)
+                    return (0, response_1.ErrorResponse)(http_status_codes_1.StatusCodes.FORBIDDEN, "authorization Failed");
+                const input = (0, class_transformer_1.plainToClass)(AddressInput_1.ProfileInput, event.body);
+                const error = yield (0, error_1.AppValidationError)(input);
+                if (error)
+                    return (0, response_1.ErrorResponse)(http_status_codes_1.StatusCodes.BAD_REQUEST, error);
+                yield this.repository.editProfile(payload.user_id, input);
+                return (0, response_1.SuccessResponse)({ message: "User Profile Updated  successfully" });
+            }
+            catch (error) {
+                console.log(error);
+                return (0, response_1.ErrorResponse)(http_status_codes_1.StatusCodes.INTERNAL_SERVER_ERROR, error);
+            }
         });
     }
     GetProfile(event) {
         return __awaiter(this, void 0, void 0, function* () {
-            return (0, response_1.SuccessResponse)({ message: "response from the Get profile" });
+            try {
+                const token = event.headers.authorization;
+                const payload = yield (0, password_1.VerifyToken)(token);
+                if (!payload) {
+                    return (0, response_1.ErrorResponse)(http_status_codes_1.StatusCodes.FORBIDDEN, "authorization Failed");
+                }
+                const result = yield this.repository.getUserProfile(payload.user_id);
+                console.log(result);
+                return (0, response_1.SuccessResponse)(result);
+            }
+            catch (error) {
+                console.log(error);
+                return (0, response_1.ErrorResponse)(http_status_codes_1.StatusCodes.INTERNAL_SERVER_ERROR, error);
+            }
         });
     }
     //Cart Section

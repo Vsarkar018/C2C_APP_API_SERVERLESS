@@ -5,8 +5,13 @@ stop_db:
 	docker compose down
 
 migrate:
-	db-migrate up
+	node node_modules/db-migrate/bin/db-migrate up
 migrate-down:
-	db-migrate donw
+	node node_modules/db-migrate/bin/db-migrate donw
 
-.PHONEY: start_db stop_db
+create_migration:
+	$ node node_modules/db-migrate/bin/db-migrate create $(n) --sql-file
+server:
+	yarn run dev
+
+.PHONEY: start_db stop_db server migrate migrate-down create_migration
