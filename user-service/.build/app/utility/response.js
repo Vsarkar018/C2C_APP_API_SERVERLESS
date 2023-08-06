@@ -5,7 +5,7 @@ const http_status_codes_1 = require("http-status-codes");
 const ResponseEntity = (statusCode, message, data) => {
     if (data) {
         return {
-            statusCode: http_status_codes_1.StatusCodes.OK,
+            statusCode,
             headers: {
                 "Access-Control-Allow-Origin": "*",
             },
@@ -17,7 +17,7 @@ const ResponseEntity = (statusCode, message, data) => {
     }
     else {
         return {
-            statusCode: http_status_codes_1.StatusCodes.OK,
+            statusCode,
             headers: {
                 "Access-Control-Allow-Origin": "*",
             },
@@ -31,7 +31,7 @@ const SuccessResponse = (data) => {
     return ResponseEntity(http_status_codes_1.StatusCodes.OK, "Success", data);
 };
 exports.SuccessResponse = SuccessResponse;
-const ErrorResponse = (code = 1000, error) => {
+const ErrorResponse = (code, error) => {
     if (Array.isArray(error)) {
         const errorObject = error[0].constraints;
         const errorMessage = errorObject[Object.keys(errorObject)[0]] || "Error Occurred";

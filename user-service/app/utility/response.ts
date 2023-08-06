@@ -2,7 +2,7 @@ import { StatusCodes } from "http-status-codes";
 const ResponseEntity = (statusCode: number, message: string, data: unknown) => {
   if (data) {
     return {
-      statusCode: StatusCodes.OK,
+      statusCode,
       headers: {
         "Access-Control-Allow-Origin": "*",
       },
@@ -13,7 +13,7 @@ const ResponseEntity = (statusCode: number, message: string, data: unknown) => {
     };
   } else {
     return {
-      statusCode: StatusCodes.OK,
+      statusCode,
       headers: {
         "Access-Control-Allow-Origin": "*",
       },
@@ -28,7 +28,7 @@ export const SuccessResponse = (data: object) => {
   return ResponseEntity(StatusCodes.OK, "Success", data);
 };
 
-export const ErrorResponse = (code = 1000, error: unknown) => {
+export const ErrorResponse = (code:number, error: unknown) => {
   if (Array.isArray(error)) {
     const errorObject = error[0].constraints;
     const errorMessage =

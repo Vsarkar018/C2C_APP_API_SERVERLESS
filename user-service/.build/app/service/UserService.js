@@ -27,9 +27,18 @@ const SignupInput_1 = require("../models/dto/SignupInput");
 const error_1 = require("../utility/error");
 const http_status_codes_1 = require("http-status-codes");
 const password_1 = require("../utility/password");
+const LoginInput_1 = require("../models/dto/LoginInput");
+const Notification_1 = require("../utility/Notification");
+const UpdateInput_1 = require("../models/dto/UpdateInput");
+const DateHelper_1 = require("../DateHelper");
 let UserService = exports.UserService = class UserService {
     constructor(repository) {
         this.repository = repository;
+    }
+    ResponseWithError(event) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return (0, response_1.ErrorResponse)(http_status_codes_1.StatusCodes.NOT_FOUND, "requested method is not supported");
+        });
     }
     CreateUser(event) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -58,12 +67,77 @@ let UserService = exports.UserService = class UserService {
     }
     UserLogin(event) {
         return __awaiter(this, void 0, void 0, function* () {
-            return (0, response_1.SuccessResponse)({ message: "response from user login" });
+            try {
+                const input = (0, class_transformer_1.plainToClass)(LoginInput_1.LoginInput, event.body);
+                const error = yield (0, error_1.AppValidationError)(input);
+                if (error)
+                    return (0, response_1.ErrorResponse)(http_status_codes_1.StatusCodes.NOT_FOUND, error);
+                const data = yield this.repository.findAccount(input.email);
+                const verified = yield (0, password_1.ValidatePassaword)(input.password, data.password, data.salt);
+                if (!verified) {
+                    throw new Error("password does not match!");
+                }
+                const token = yield (0, password_1.GetToken)(data);
+                return (0, response_1.SuccessResponse)({ token });
+            }
+            catch (error) {
+                console.log(error);
+                return (0, response_1.ErrorResponse)(http_status_codes_1.StatusCodes.INTERNAL_SERVER_ERROR, error);
+            }
+        });
+    }
+    GetVerificationToken(event) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const token = event.headers.authorization;
+                const payload = yield (0, password_1.VerifyToken)(token);
+                if (!payload)
+                    return (0, response_1.ErrorResponse)(http_status_codes_1.StatusCodes.FORBIDDEN, "Authorization failed");
+                const { code, expiry } = (0, Notification_1.GenerateAccessCode)();
+                yield this.repository.updateVerificationCode(payload.user_id, code, expiry);
+                // const response = await SendVerificationCode(code, payload.phone);
+                console.log(code, expiry);
+                return (0, response_1.SuccessResponse)({
+                    message: "verification code is sent to your registered mobile number",
+                });
+            }
+            catch (error) {
+                console.log(error);
+                return (0, response_1.ErrorResponse)(http_status_codes_1.StatusCodes.INTERNAL_SERVER_ERROR, error);
+            }
         });
     }
     VerifyUser(event) {
         return __awaiter(this, void 0, void 0, function* () {
-            return (0, response_1.SuccessResponse)({ message: "response from verify user" });
+            try {
+                const token = event.headers.authorization;
+                const payload = yield (0, password_1.VerifyToken)(token);
+                if (!payload) {
+                    return (0, response_1.ErrorResponse)(http_status_codes_1.StatusCodes.FORBIDDEN, "Authorization failed");
+                }
+                const input = (0, class_transformer_1.plainToClass)(UpdateInput_1.VerificationInput, event.body);
+                const error = yield (0, error_1.AppValidationError)(input);
+                if (error)
+                    return (0, response_1.ErrorResponse)(http_status_codes_1.StatusCodes.NOT_FOUND, error);
+                const { verification_code, expiry } = yield this.repository.findAccount(payload.email);
+                if (verification_code === parseInt(input.code)) {
+                    const currentTime = new Date();
+                    const diff = (0, DateHelper_1.TimeDifference)(expiry, currentTime.toISOString(), "m");
+                    if (diff <= 0) {
+                        return (0, response_1.ErrorResponse)(http_status_codes_1.StatusCodes.FORBIDDEN, "verfication code expired");
+                    }
+                }
+                else {
+                    return (0, response_1.ErrorResponse)(http_status_codes_1.StatusCodes.FORBIDDEN, "Verification Failed Given verification code is wrong");
+                }
+                yield this.repository.updateVerificationStatus(payload.user_id);
+                console.log("User Verified Successfully");
+                return (0, response_1.SuccessResponse)({ message: "User Verified Successfully" });
+            }
+            catch (error) {
+                console.log(error);
+                return (0, response_1.ErrorResponse)(http_status_codes_1.StatusCodes.INTERNAL_SERVER_ERROR, error);
+            }
         });
     }
     //Profile Section

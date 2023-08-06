@@ -6,13 +6,33 @@ import { plainToClass } from "class-transformer";
 import { SignupInput } from "../models/dto/SignupInput";
 import { AppValidationError } from "../utility/error";
 import { StatusCodes } from "http-status-codes";
-import { GenSalt, GetHashedPassowrd } from "../utility/password";
+import {
+  GenSalt,
+  GetHashedPassowrd,
+  GetToken,
+  ValidatePassaword,
+  VerifyToken,
+} from "../utility/password";
+import { LoginInput } from "../models/dto/LoginInput";
+import {
+  GenerateAccessCode,
+  SendVerificationCode,
+} from "../utility/Notification";
+import { VerificationInput } from "../models/dto/UpdateInput";
+import { TimeDifference } from "../DateHelper";
 
 @autoInjectable()
 export class UserService {
   repository: UserRepository;
   constructor(repository: UserRepository) {
     this.repository = repository;
+  }
+
+  async ResponseWithError(event: APIGatewayProxyEventV2) {
+    return ErrorResponse(
+      StatusCodes.NOT_FOUND,
+      "requested method is not supported"
+    );
   }
 
   async CreateUser(event: APIGatewayProxyEventV2) {
@@ -35,18 +55,97 @@ export class UserService {
     } catch (error) {
       console.log(error);
 
-      return ErrorResponse(StatusCodes.INTERNAL_SERVER_ERROR,error)
+      return ErrorResponse(StatusCodes.INTERNAL_SERVER_ERROR, error);
     }
   }
 
-
-  
   async UserLogin(event: APIGatewayProxyEventV2) {
-    return SuccessResponse({ message: "response from user login" });
+    try {
+      const input = plainToClass(LoginInput, event.body);
+
+      const error = await AppValidationError(input);
+      if (error) return ErrorResponse(StatusCodes.NOT_FOUND, error);
+      const data = await this.repository.findAccount(input.email);
+      const verified = await ValidatePassaword(
+        input.password,
+        data.password,
+        data.salt
+      );
+
+      if (!verified) {
+        throw new Error("password does not match!");
+      }
+      const token = await GetToken(data);
+      return SuccessResponse({ token });
+    } catch (error) {
+      console.log(error);
+      return ErrorResponse(StatusCodes.INTERNAL_SERVER_ERROR, error);
+    }
+  }
+
+  async GetVerificationToken(event: APIGatewayProxyEventV2) {
+    try {
+      const token = event.headers.authorization;
+      const payload = await VerifyToken(token);
+      if (!payload)
+        return ErrorResponse(StatusCodes.FORBIDDEN, "Authorization failed");
+      const { code, expiry } = GenerateAccessCode();
+      await this.repository.updateVerificationCode(
+        payload.user_id,
+        code,
+        expiry
+      );
+
+      // const response = await SendVerificationCode(code, payload.phone);
+      console.log(code, expiry);
+
+      return SuccessResponse({
+        message: "verification code is sent to your registered mobile number",
+      });
+    } catch (error) {
+      console.log(error);
+      return ErrorResponse(StatusCodes.INTERNAL_SERVER_ERROR, error);
+    }
   }
 
   async VerifyUser(event: APIGatewayProxyEventV2) {
-    return SuccessResponse({ message: "response from verify user" });
+    try {
+      const token = event.headers.authorization;
+      const payload = await VerifyToken(token);
+      if (!payload) {
+        return ErrorResponse(StatusCodes.FORBIDDEN, "Authorization failed");
+      }
+
+      const input = plainToClass(VerificationInput, event.body);
+      const error = await AppValidationError(input);
+      if (error) return ErrorResponse(StatusCodes.NOT_FOUND, error);
+
+      const { verification_code, expiry } = await this.repository.findAccount(
+        payload.email
+      );
+      if (verification_code === parseInt(input.code)) {
+        const currentTime = new Date();
+        const diff = TimeDifference(expiry, currentTime.toISOString(), "m");
+        if (diff <= 0) {
+          return ErrorResponse(
+            StatusCodes.FORBIDDEN,
+            "verfication code expired"
+          );
+        }
+      } else {
+        return ErrorResponse(
+          StatusCodes.FORBIDDEN,
+          "Verification Failed Given verification code is wrong"
+        );
+      }
+      await this.repository.updateVerificationStatus(payload.user_id);
+      console.log("User Verified Successfully");
+
+      return SuccessResponse({ message: "User Verified Successfully" });
+    } catch (error) {
+      console.log(error);
+      return ErrorResponse(StatusCodes.INTERNAL_SERVER_ERROR, error);
+    }
   }
 
   //Profile Section

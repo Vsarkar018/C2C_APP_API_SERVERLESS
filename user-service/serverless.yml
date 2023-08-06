@@ -15,55 +15,58 @@ functions:
     handler: app/handler.Signup
     events:
       - httpApi:
-          path: /signup
+          path: /user/signup
           method: post
   login:
     handler: app/handler.Login
     events:
       - httpApi:
-          path: /login
+          path: /user/login
           method: post
   verify:
     handler: app/handler.Verify
     events:
       - httpApi:
-          path: /verify
+          path: /user/verify
           method: post
+      - httpApi:
+          path: /user/verify
+          method: get
   profile:
     handler: app/handler.Profile
     events:
       - httpApi:
-          path: /user
+          path: /user/profile
           method: post
       - httpApi:
-          path: /user
+          path: /user/profile
           method: put
       - httpApi:
-          path: /user
+          path: /user/profile
           method: get
   cart:
     handler: app/handler.Cart
     events:
       - httpApi:
-          path: /cart
+          path: /user/cart
           method: post
       - httpApi:
-          path: /cart
+          path: /user/cart
           method: put
       - httpApi:
-          path: /cart
+          path: /user/cart
           method: get
   payment:
     handler: app/handler.Payment
     events:
       - httpApi:
-          path: /payment
+          path: /user/payment
           method: post
       - httpApi:
-          path: /payment
+          path: /user/payment
           method: put
       - httpApi:
-          path: /payment
+          path: /user/payment
           method: get
 
 plugins:
