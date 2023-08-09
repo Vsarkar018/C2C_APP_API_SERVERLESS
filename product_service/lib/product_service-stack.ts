@@ -7,9 +7,15 @@ export class ProductServiceStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
     super(scope, id, props);
     const Bucket = "";
-    const { productService } = new ServiceStack(this, "ProductService", {});
+    const { productService, categoryService, dealService } = new ServiceStack(
+      this,
+      "ProductService",
+      {}
+    );
     new ApiGatewayStack(this, "ProductApiGateway", {
       productService,
+      categoryService,
+      dealService,
     });
   }
 }
