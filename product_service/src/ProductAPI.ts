@@ -1,16 +1,36 @@
 import { APIGatewayEvent, APIGatewayProxyResult, Context } from "aws-lambda";
+import { ErrorResponse } from "./Utils/response";
+import { StatusCodes } from "http-status-codes";
+import { ProductService } from "./Service/ProductService";
+import { ProductRepository } from "./Repository/ProductRepo";
+import "./Utils";
+
+const service = new ProductService(new ProductRepository());
 
 export const handler = async (
   event: APIGatewayEvent,
   context: Context
 ): Promise<APIGatewayProxyResult> => {
-  console.log(`EVENT: ${JSON.stringify(event)}`);
-  console.log(`Context: ${JSON.stringify(context)}`);
-  return {
-    statusCode: 200,
-    body: JSON.stringify({
-      message: "Hello from product service",
-      path: `${event.path}, ${event.pathParameters}`,
-    }),
-  };
+  const isRoot = event.pathParameters === null;
+  switch (event.httpMethod.toLowerCase()) {
+    case "post":
+      if (isRoot) {
+        return service.createProduct(event);
+      }
+      break;
+    case "get":
+      return isRoot ? service.getAllProducts(event) : service.getProduct(event);
+    case "put":
+      if (!isRoot) {
+        return service.editProduct(event);
+      }
+    case "delete":
+      if (!isRoot) {
+        return service.deleteProduct(event);
+      }
+  }
+  return ErrorResponse(
+    StatusCodes.NOT_FOUND,
+    "requested method is not allowed"
+  );
 };
