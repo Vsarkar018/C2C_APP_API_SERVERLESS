@@ -7,6 +7,7 @@ interface ApiGatewayStackProps {
   productService: IFunction;
   categoryService: IFunction;
   dealService: IFunction;
+  imageService: IFunction;
 }
 
 interface ResourceType {
@@ -22,7 +23,12 @@ export class ApiGatewayStack extends Construct {
 
   addResources(
     serviceName: string,
-    { categoryService, productService, dealService }: ApiGatewayStackProps
+    {
+      categoryService,
+      productService,
+      dealService,
+      imageService,
+    }: ApiGatewayStackProps
   ) {
     const apigw = new aws_apigateway.RestApi(this, `${serviceName}-ApiGtw`);
     this.createEnpoints(productService, apigw, {
@@ -48,6 +54,10 @@ export class ApiGatewayStack extends Construct {
         name: "{id}",
         methods: ["GET", "PUT", "DELETE"],
       },
+    });
+    this.createEnpoints(imageService, apigw, {
+      name: "imageuploader",
+      methods: ["GET"],
     });
   }
 
