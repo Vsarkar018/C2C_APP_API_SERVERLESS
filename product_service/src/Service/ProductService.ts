@@ -7,16 +7,17 @@ import { StatusCodes } from "http-status-codes";
 import { plainToClass } from "class-transformer";
 
 export class ProductService {
-  repository: ProductRepository;
+  _repository: ProductRepository;
   constructor(repository: ProductRepository) {
-    this.repository = repository;
+    this._repository = repository;
   }
   async createProduct(event: APIGatewayEvent) {
     try {
-      const input = plainToClass(ProductInput, event.body);
+      const input = plainToClass(ProductInput, JSON.parse(event.body!));
       const error = await AppValidationError(input);
       if (error) return ErrorResponse(StatusCodes.NOT_FOUND, error);
-      const data = this.repository.createProduct(input);
+
+      const data = await this._repository.createProduct(input);
       return SuccessResponse(data);
     } catch (error) {
       console.log(error);
@@ -24,15 +25,64 @@ export class ProductService {
     }
   }
   async getProduct(event: APIGatewayEvent) {
-    return SuccessResponse({ msg: "Product fetched!" });
+    try {
+      const productID = event.pathParameters?.id;
+      if (!productID) {
+        return ErrorResponse(
+          StatusCodes.FORBIDDEN,
+          "PLEASE PROVIDE PRODUCT ID"
+        );
+      }
+      const data = await this._repository.getProduct(productID);
+      return SuccessResponse(data);
+    } catch (error) {
+      console.log(error);
+      return ErrorResponse(StatusCodes.INTERNAL_SERVER_ERROR, error);
+    }
   }
   async getAllProducts(event: APIGatewayEvent) {
-    return SuccessResponse({ msg: "All products fetched!" });
+    try {
+      const data = await this._repository.geAllProducts();
+      return SuccessResponse(data);
+    } catch (error) {
+      console.log(error);
+      return ErrorResponse(StatusCodes.INTERNAL_SERVER_ERROR, error);
+    }
   }
   async editProduct(event: APIGatewayEvent) {
-    return SuccessResponse({ msg: "Product Edited!" });
+    try {
+      const input = plainToClass(ProductInput, JSON.parse(event.body!));
+      const error = await AppValidationError(input);
+      if (error) return ErrorResponse(StatusCodes.NOT_FOUND, error);
+      const productID = event.pathParameters?.id;
+      if (!productID) {
+        return ErrorResponse(
+          StatusCodes.FORBIDDEN,
+          "PLEASE PROVIDE PRODUCT ID"
+        );
+      }
+      input.id = productID;
+      const data = await this._repository.updateProduct(input);
+      return SuccessResponse(data);
+    } catch (error) {
+      console.log(error);
+      return ErrorResponse(StatusCodes.INTERNAL_SERVER_ERROR, error);
+    }
   }
   async deleteProduct(event: APIGatewayEvent) {
-    return SuccessResponse({ msg: "Product Deleted!" });
+    try {
+      const productID = event.pathParameters?.id;
+      if (!productID) {
+        return ErrorResponse(
+          StatusCodes.FORBIDDEN,
+          "PLEASE PROVIDE PRODUCT ID"
+        );
+      }
+      const data = await this._repository.deleteProduct(productID);
+      return SuccessResponse(data);
+    } catch (error) {
+      console.log(error);
+      return ErrorResponse(StatusCodes.INTERNAL_SERVER_ERROR, error);
+    }
   }
 }
