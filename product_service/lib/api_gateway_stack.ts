@@ -30,7 +30,7 @@ export class ApiGatewayStack extends Construct {
       methods: ["GET", "POST"],
       child: {
         name: "{id}",
-        methods: ["GET", "POST", "DELETE"],
+        methods: ["GET", "PUT", "DELETE"],
       },
     });
     this.createEnpoints(categoryService, apigw, {
@@ -38,7 +38,7 @@ export class ApiGatewayStack extends Construct {
       methods: ["GET", "POST"],
       child: {
         name: "{id}",
-        methods: ["GET", "POST", "DELETE"],
+        methods: ["GET", "PUT", "DELETE"],
       },
     });
     this.createEnpoints(dealService, apigw, {
@@ -46,7 +46,7 @@ export class ApiGatewayStack extends Construct {
       methods: ["GET", "POST"],
       child: {
         name: "{id}",
-        methods: ["GET", "POST", "DELETE"],
+        methods: ["GET", "PUT", "DELETE"],
       },
     });
   }

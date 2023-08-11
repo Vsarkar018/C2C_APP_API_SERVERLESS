@@ -17,7 +17,6 @@ export const handler = async (
       if (isRoot) {
         return service.createProduct(event);
       }
-      break;
     case "get":
       return isRoot ? service.getAllProducts(event) : service.getProduct(event);
     case "put":

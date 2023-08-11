@@ -48,6 +48,6 @@ export class ProductRepository {
     return existingProduct.save();
   }
   async deleteProduct(id: string) {
-    return products.deleteOne({ id });
+    return products.deleteOne({ _id :id });
   }
 }

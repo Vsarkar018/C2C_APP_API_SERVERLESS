@@ -34,6 +34,9 @@ export class ProductService {
         );
       }
       const data = await this._repository.getProduct(productID);
+      if (!data) {
+        return ErrorResponse(StatusCodes.NOT_FOUND, "Product Not found");
+      }
       return SuccessResponse(data);
     } catch (error) {
       console.log(error);
@@ -63,6 +66,9 @@ export class ProductService {
       }
       input.id = productID;
       const data = await this._repository.updateProduct(input);
+       if (!data) {
+         return ErrorResponse(StatusCodes.NOT_FOUND, "Product Not found");
+       }
       return SuccessResponse(data);
     } catch (error) {
       console.log(error);
@@ -79,6 +85,9 @@ export class ProductService {
         );
       }
       const data = await this._repository.deleteProduct(productID);
+       if (!data) {
+         return ErrorResponse(StatusCodes.NOT_FOUND, "Product Not found");
+       }
       return SuccessResponse(data);
     } catch (error) {
       console.log(error);
