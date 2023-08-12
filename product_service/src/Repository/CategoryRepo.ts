@@ -1,5 +1,5 @@
 import { categories, CategoryDoc } from "../Models/CategoryModel";
-import { CategoryInput } from "../Models/dto/CategoryInput";
+import { AddItemInput, CategoryInput } from "../Models/dto/CategoryInput";
 
 export class CategoryRepository {
   constructor() {}
@@ -54,5 +54,18 @@ export class CategoryRepository {
   }
   async deleteCategory(id: string) {
     return categories.deleteOne({ _id: id });
+  }
+  async addItem({ id, products }: AddItemInput) {
+    let category = (await categories.findById(id)) as CategoryDoc;
+    category.products = [...category.products, ...products];
+    return category.save();
+  }
+  async removeItem({ id, products }: AddItemInput) {
+    let category = (await categories.findById(id)) as CategoryDoc;
+    const excludeProducts = category.products.filter(
+      (item) => !products.includes(item)
+    );
+    category.products = excludeProducts;
+    return category.save();
   }
 }
