@@ -4,10 +4,6 @@ import { v4 as uuid } from "uuid";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 const s3Client = new S3Client({
   region: "ap-south-1",
-  credentials: {
-    accessKeyId: "AKIAYCBDFT3CQ2EP6KUV",
-    secretAccessKey: "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",
-  },
 });
 
 export const handler = async (
