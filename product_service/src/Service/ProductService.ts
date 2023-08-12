@@ -5,6 +5,7 @@ import { ProductInput } from "../Models/dto/ProductInput";
 import { AppValidationError } from "../Utils/error";
 import { StatusCodes } from "http-status-codes";
 import { plainToClass } from "class-transformer";
+import { CategoryRepository } from "../Repository/CategoryRepo";
 
 export class ProductService {
   _repository: ProductRepository;
@@ -17,7 +18,11 @@ export class ProductService {
       const error = await AppValidationError(input);
       if (error) return ErrorResponse(StatusCodes.NOT_FOUND, error);
 
-      const data = await this._repository.createProduct(input);
+      const data = this._repository.createProduct(input);
+      await new CategoryRepository().addItem({
+        id: input.categoryId,
+        products: [data._id],
+      });
       return SuccessResponse(data);
     } catch (error) {
       console.log(error);
@@ -66,9 +71,9 @@ export class ProductService {
       }
       input.id = productID;
       const data = await this._repository.updateProduct(input);
-       if (!data) {
-         return ErrorResponse(StatusCodes.NOT_FOUND, "Product Not found");
-       }
+      if (!data) {
+        return ErrorResponse(StatusCodes.NOT_FOUND, "Product Not found");
+      }
       return SuccessResponse(data);
     } catch (error) {
       console.log(error);
@@ -84,11 +89,17 @@ export class ProductService {
           "PLEASE PROVIDE PRODUCT ID"
         );
       }
-      const data = await this._repository.deleteProduct(productID);
-       if (!data) {
-         return ErrorResponse(StatusCodes.NOT_FOUND, "Product Not found");
-       }
-      return SuccessResponse(data);
+      const { category_id, delteResult } = await this._repository.deleteProduct(
+        productID
+      );
+      if (!delteResult) {
+        return ErrorResponse(StatusCodes.NOT_FOUND, "Product Not found");
+      }
+      await new CategoryRepository().removeItem({
+        id: category_id,
+        products: [productID],
+      });
+      return SuccessResponse(delteResult);
     } catch (error) {
       console.log(error);
       return ErrorResponse(StatusCodes.INTERNAL_SERVER_ERROR, error);

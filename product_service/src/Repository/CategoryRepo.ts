@@ -1,14 +1,14 @@
-import { categories, CategoryDoc } from "../Models/CategoryModel";
+import { categories, CategoryDoc } from "../Models";
 import { AddItemInput, CategoryInput } from "../Models/dto/CategoryInput";
 
 export class CategoryRepository {
   constructor() {}
-  async createCategory({ name, parentId }: CategoryInput) {
+  async createCategory({ name, parentId, imageUrl }: CategoryInput) {
     const newCategory = await categories.create({
       name,
       parentId,
-      displayOrder: [],
       products: [],
+      imageUrl,
     });
     if (parentId) {
       const parentCategory = (await categories.findById(
@@ -46,10 +46,26 @@ export class CategoryRepository {
       .skip(offest)
       .limit(perPage ? perPage : 100);
   }
-  async editCategory({ id, name, displayOrder }: CategoryInput) {
+  async getTopCategories() {
+    return categories
+      .find(
+        {
+          parentId: { $ne: null },
+        },
+        { products: { $slice: 10 } }
+      )
+      .populate({
+        path: "products",
+        model: "products",
+      })
+      .sort({ displayOrder: "descending" })
+      .limit(10);
+  }
+  async editCategory({ id, name, displayOrder, imageUrl }: CategoryInput) {
     let category = (await categories.findById(id)) as CategoryDoc;
     category.name = name;
     category.displayOrder = displayOrder;
+    category.imageUrl = imageUrl;
     return category.save();
   }
   async deleteCategory(id: string) {

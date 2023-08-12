@@ -49,6 +49,11 @@ export class CategoryService {
   }
   async getAlleCategories(event: APIGatewayEvent) {
     try {
+      const type = event.queryStringParameters?.type;
+      if (type === "top") {
+        const data = await this._repository.getTopCategories();
+        return SuccessResponse(data);
+      }
       const data = await this._repository.getAllCategories();
       return SuccessResponse(data);
     } catch (error) {

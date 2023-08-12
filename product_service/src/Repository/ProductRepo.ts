@@ -1,4 +1,4 @@
-import { ProductDoc, products } from "../Models/ProductModel";
+import { ProductDoc, products } from "../Models";
 import { ProductInput } from "../Models/dto/ProductInput";
 
 export class ProductRepository {
@@ -10,7 +10,7 @@ export class ProductRepository {
     price,
     imageUrl,
     categoryId,
-  }: ProductInput) {
+  }: ProductInput): Promise<ProductDoc> {
     return products.create({
       name,
       description,
@@ -21,7 +21,7 @@ export class ProductRepository {
     });
   }
   async geAllProducts(offset = 0, pages?: number) {
-    return  products
+    return products
       .find()
       .skip(offset)
       .limit(pages ? pages : 500);
@@ -48,6 +48,8 @@ export class ProductRepository {
     return existingProduct.save();
   }
   async deleteProduct(id: string) {
-    return products.deleteOne({ _id :id });
+    const { category_id } = (await products.findById(id)) as ProductDoc;
+    const delteResult = await products.deleteOne({ _id: id });
+    return { category_id, delteResult };
   }
 }

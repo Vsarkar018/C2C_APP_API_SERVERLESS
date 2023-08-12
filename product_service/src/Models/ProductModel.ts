@@ -12,7 +12,7 @@ export const ProductSchema = new mongoose.Schema(
   {
     name: String,
     description: String,
-    category_id: String,
+    category_id: { type: mongoose.SchemaTypes.ObjectId, ref: "categories" },
     image_url: String,
     price: Number,
     availability: Boolean,
