@@ -18,7 +18,7 @@ export class ProductService {
       const error = await AppValidationError(input);
       if (error) return ErrorResponse(StatusCodes.NOT_FOUND, error);
 
-      const data = this._repository.createProduct(input);
+      const data = await this._repository.createProduct(input);
       await new CategoryRepository().addItem({
         id: input.categoryId,
         products: [data._id],
