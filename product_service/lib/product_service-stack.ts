@@ -7,7 +7,7 @@ import { S3BucketStack } from "./S3Bucket-stack";
 export class ProductServiceStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
     super(scope, id, props);
-    const { bucket } = new S3BucketStack(scope, "productImages");
+    const { bucket } = new S3BucketStack(this, "productImages");
     const { productService, categoryService, dealService, imageService } =
       new ServiceStack(this, "ProductService", {
         bucket: bucket.bucketName,

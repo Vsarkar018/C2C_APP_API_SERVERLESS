@@ -18,7 +18,7 @@ new ProductServiceStack(app, "ProductServiceStack", {
   // env: { account: '123456789012', region: 'us-east-1' },
 
   /* For more information, see https://docs.aws.amazon.com/cdk/latest/guide/environments.html */
-  synthesizer: new cdk.DefaultStackSynthesizer({
-    generateBootstrapVersionRule: false,
-  }),
+  // synthesizer: new cdk.DefaultStackSynthesizer({
+  //   generateBootstrapVersionRule: false,
+  // }),
 });
