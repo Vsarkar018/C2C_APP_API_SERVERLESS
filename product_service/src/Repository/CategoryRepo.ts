@@ -14,8 +14,8 @@ export class CategoryRepository {
       const parentCategory = (await categories.findById(
         parentId
       )) as CategoryDoc;
-      parentCategory.SubCategories = [
-        ...parentCategory.SubCategories,
+      parentCategory.subCategories = [
+        ...parentCategory.subCategories,
         newCategory,
       ];
       await parentCategory.save();

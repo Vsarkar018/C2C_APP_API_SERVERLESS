@@ -34,13 +34,19 @@ export class CategoryService {
   async getCategory(event: APIGatewayEvent) {
     try {
       const categoryId = event.pathParameters?.id;
+      const offset = Number(event.pathParameters?.offset);
+      const perPage = Number(event.pathParameters?.perPage);
       if (!categoryId) {
         return ErrorResponse(
           StatusCodes.FORBIDDEN,
           "please provide category ID"
         );
       }
-      const data = await this._repository.getCategory(categoryId);
+      const data = await this._repository.getCategory(
+        categoryId,
+        offset,
+        perPage
+      );
       return SuccessResponse(data);
     } catch (error) {
       console.log(error);

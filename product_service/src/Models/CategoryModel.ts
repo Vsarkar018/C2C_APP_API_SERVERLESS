@@ -3,7 +3,7 @@ type CategoryModel = {
   name: string;
   nameTranslation: string;
   parentId: string;
-  SubCategories: CategoryDoc[];
+  subCategories: CategoryDoc[];
   products: string[];
   displayOrder: number;
   imageUrl: string;
