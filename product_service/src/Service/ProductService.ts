@@ -6,11 +6,18 @@ import { AppValidationError } from "../Utils/error";
 import { StatusCodes } from "http-status-codes";
 import { plainToClass } from "class-transformer";
 import { CategoryRepository } from "../Repository/CategoryRepo";
+import { ServiceInput } from "../Models/dto/ServiceInput";
 
 export class ProductService {
   _repository: ProductRepository;
   constructor(repository: ProductRepository) {
     this._repository = repository;
+  }
+  async ErrorResponse(event: APIGatewayEvent) {
+    return ErrorResponse(
+      StatusCodes.NOT_FOUND,
+      "requested method is not allowed"
+    );
   }
   async createProduct(event: APIGatewayEvent) {
     try {
@@ -100,6 +107,27 @@ export class ProductService {
         products: [productID],
       });
       return SuccessResponse(delteResult);
+    } catch (error) {
+      console.log(error);
+      return ErrorResponse(StatusCodes.INTERNAL_SERVER_ERROR, error);
+    }
+  }
+
+  async handleQueueOperations(event: APIGatewayEvent) {
+    try {
+      const input = plainToClass(ServiceInput, event.body);
+      const error = await AppValidationError(input);
+      if (error) {
+        return ErrorResponse(StatusCodes.NOT_FOUND, error);
+      }
+      console.log("INPUT", input);
+
+      const { _id, name, price, image_url } = await this._repository.getProduct(
+        input.productId
+      );
+      console.log("Product Detaisl ", { _id, name, price, image_url });
+
+      return SuccessResponse({ productId: _id, name, price, image_url });
     } catch (error) {
       console.log(error);
       return ErrorResponse(StatusCodes.INTERNAL_SERVER_ERROR, error);

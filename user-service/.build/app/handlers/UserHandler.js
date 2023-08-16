@@ -8,60 +8,65 @@ const tsyringe_1 = require("tsyringe");
 const UserService_1 = require("../service/UserService");
 const core_1 = __importDefault(require("@middy/core"));
 const http_json_body_parser_1 = __importDefault(require("@middy/http-json-body-parser"));
-const service = tsyringe_1.container.resolve(UserService_1.UserService);
+const CartServie_1 = require("../service/CartServie");
+const userService = tsyringe_1.container.resolve(UserService_1.UserService);
+const cartService = tsyringe_1.container.resolve(CartServie_1.CartService);
 exports.Signup = (0, core_1.default)((event) => {
-    return service.CreateUser(event);
+    return userService.CreateUser(event);
 }).use((0, http_json_body_parser_1.default)());
 exports.Login = (0, core_1.default)((event) => {
-    return service.UserLogin(event);
+    return userService.UserLogin(event);
 }).use((0, http_json_body_parser_1.default)());
 exports.Verify = (0, core_1.default)((event) => {
     const httpMethod = event.requestContext.http.method.toLowerCase();
     if (httpMethod === "post") {
-        return service.VerifyUser(event);
+        return userService.VerifyUser(event);
     }
     else if (httpMethod === "get") {
-        return service.GetVerificationToken(event);
+        return userService.GetVerificationToken(event);
     }
-    return service.ResponseWithError(event);
+    return userService.ResponseWithError(event);
 }).use((0, http_json_body_parser_1.default)());
 exports.Profile = (0, core_1.default)((event) => {
     const httpMethod = event.requestContext.http.method.toLowerCase();
     if (httpMethod === "post") {
-        return service.CreateProfile(event);
+        return userService.CreateProfile(event);
     }
     else if (httpMethod === "put") {
-        return service.EditProfile(event);
+        return userService.EditProfile(event);
     }
     else if (httpMethod === "get") {
-        return service.GetProfile(event);
+        return userService.GetProfile(event);
     }
-    return service.ResponseWithError(event);
+    return userService.ResponseWithError(event);
 }).use((0, http_json_body_parser_1.default)());
 exports.Payment = (0, core_1.default)((event) => {
     const httpMethod = event.requestContext.http.method.toLowerCase();
     if (httpMethod === "post") {
-        return service.CreatePaymentMethod(event);
+        return userService.CreatePaymentMethod(event);
     }
     else if (httpMethod === "put") {
-        return service.UpdatePaymentMethod(event);
+        return userService.UpdatePaymentMethod(event);
     }
     else if (httpMethod === "get") {
-        return service.GetPaymentMethod(event);
+        return userService.GetPaymentMethod(event);
     }
-    return service.ResponseWithError(event);
+    return userService.ResponseWithError(event);
 }).use((0, http_json_body_parser_1.default)());
 exports.Cart = (0, core_1.default)((event) => {
     const httpMethod = event.requestContext.http.method.toLowerCase();
     if (httpMethod === "post") {
-        return service.CreateCart(event);
+        return cartService.CreateCart(event);
     }
     else if (httpMethod === "put") {
-        return service.UpdateCart(event);
+        return cartService.UpdateCart(event);
     }
     else if (httpMethod === "get") {
-        return service.GetCart(event);
+        return cartService.GetCart(event);
     }
-    return service.ResponseWithError(event);
+    else if (httpMethod === "delete") {
+        return cartService.DeleteCart(event);
+    }
+    return cartService.ResponseWithError(event);
 }).use((0, http_json_body_parser_1.default)());
 //# sourceMappingURL=UserHandler.js.map

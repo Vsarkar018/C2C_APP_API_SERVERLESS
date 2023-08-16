@@ -1,63 +1,65 @@
 import { container } from "tsyringe";
 import { APIGatewayProxyEventV2 } from "aws-lambda";
 import { UserService } from "../service/UserService";
-import { ErrorResponse } from "../utility/response";
-import { StatusCodes } from "http-status-codes";
 import middy from "@middy/core";
 import jsonBodyParser from "@middy/http-json-body-parser";
+import { CartService } from "../service/CartServie";
 
-const service = container.resolve(UserService);
+const userService = container.resolve(UserService);
+const cartService = container.resolve(CartService);
 
 export const Signup = middy((event: APIGatewayProxyEventV2) => {
-  return service.CreateUser(event);
+  return userService.CreateUser(event);
 }).use(jsonBodyParser());
 
 export const Login = middy((event: APIGatewayProxyEventV2) => {
-  return service.UserLogin(event);
+  return userService.UserLogin(event);
 }).use(jsonBodyParser());
 
 export const Verify = middy((event: APIGatewayProxyEventV2) => {
   const httpMethod = event.requestContext.http.method.toLowerCase();
   if (httpMethod === "post") {
-    return service.VerifyUser(event);
+    return userService.VerifyUser(event);
   } else if (httpMethod === "get") {
-    return service.GetVerificationToken(event);
+    return userService.GetVerificationToken(event);
   }
-  return service.ResponseWithError(event);
+  return userService.ResponseWithError(event);
 }).use(jsonBodyParser());
 
 export const Profile = middy((event: APIGatewayProxyEventV2) => {
   const httpMethod = event.requestContext.http.method.toLowerCase();
   if (httpMethod === "post") {
-    return service.CreateProfile(event);
+    return userService.CreateProfile(event);
   } else if (httpMethod === "put") {
-    return service.EditProfile(event);
+    return userService.EditProfile(event);
   } else if (httpMethod === "get") {
-    return service.GetProfile(event);
+    return userService.GetProfile(event);
   }
-  return service.ResponseWithError(event);
+  return userService.ResponseWithError(event);
 }).use(jsonBodyParser());
 
 export const Payment = middy((event: APIGatewayProxyEventV2) => {
   const httpMethod = event.requestContext.http.method.toLowerCase();
   if (httpMethod === "post") {
-    return service.CreatePaymentMethod(event);
+    return userService.CreatePaymentMethod(event);
   } else if (httpMethod === "put") {
-    return service.UpdatePaymentMethod(event);
+    return userService.UpdatePaymentMethod(event);
   } else if (httpMethod === "get") {
-    return service.GetPaymentMethod(event);
+    return userService.GetPaymentMethod(event);
   }
-  return service.ResponseWithError(event);
+  return userService.ResponseWithError(event);
 }).use(jsonBodyParser());
 
 export const Cart = middy((event: APIGatewayProxyEventV2) => {
   const httpMethod = event.requestContext.http.method.toLowerCase();
   if (httpMethod === "post") {
-    return service.CreateCart(event);
+    return cartService.CreateCart(event);
   } else if (httpMethod === "put") {
-    return service.UpdateCart(event);
+    return cartService.UpdateCart(event);
   } else if (httpMethod === "get") {
-    return service.GetCart(event);
+    return cartService.GetCart(event);
+  } else if (httpMethod === "delete") {
+    return cartService.DeleteCart(event);
   }
-  return service.ResponseWithError(event);
+  return cartService.ResponseWithError(event);
 }).use(jsonBodyParser());

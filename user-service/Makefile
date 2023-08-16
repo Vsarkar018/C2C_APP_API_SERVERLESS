@@ -7,7 +7,7 @@ stop_db:
 migrate:
 	node node_modules/db-migrate/bin/db-migrate up
 migrate-down:
-	node node_modules/db-migrate/bin/db-migrate donw
+	node node_modules/db-migrate/bin/db-migrate down
 
 create_migration:
 	$ node node_modules/db-migrate/bin/db-migrate create $(n) --sql-file

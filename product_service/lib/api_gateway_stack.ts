@@ -8,6 +8,7 @@ interface ApiGatewayStackProps {
   categoryService: IFunction;
   dealService: IFunction;
   imageService: IFunction;
+  queueService: IFunction;
 }
 
 interface ResourceType {
@@ -28,6 +29,7 @@ export class ApiGatewayStack extends Construct {
       productService,
       dealService,
       imageService,
+      queueService,
     }: ApiGatewayStackProps
   ) {
     const apigw = new aws_apigateway.RestApi(this, `${serviceName}-ApiGtw`);
@@ -58,6 +60,10 @@ export class ApiGatewayStack extends Construct {
     this.createEnpoints(imageService, apigw, {
       name: "imageuploader",
       methods: ["GET"],
+    });
+    this.createEnpoints(queueService, apigw, {
+      name: "products-queue",
+      methods: ["POST"],
     });
   }
 

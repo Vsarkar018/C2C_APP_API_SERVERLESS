@@ -27,7 +27,7 @@ export class ProductRepository {
       .limit(pages ? pages : 500);
   }
   async getProduct(id: string) {
-    return products.findById(id);
+    return (await products.findById(id)) as ProductDoc;
   }
   async updateProduct({
     id,
