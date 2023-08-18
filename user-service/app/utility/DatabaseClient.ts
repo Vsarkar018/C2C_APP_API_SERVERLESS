@@ -9,11 +9,3 @@ export const DBClient = async () => {
     port: 5432,
   });
 };
-
-/*
- host: "ebayuserservice.cxbwjczjad93.ap-south-1.rds.amazonaws.com",
-    user: "devVishal",
-    database: "user_service",
-    password: "gQpIoXAx2B5V3V1b2XZz",
-    port: 5432,
-*/

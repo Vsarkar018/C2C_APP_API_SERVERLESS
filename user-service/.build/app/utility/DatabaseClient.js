@@ -21,11 +21,4 @@ const DBClient = () => __awaiter(void 0, void 0, void 0, function* () {
     });
 });
 exports.DBClient = DBClient;
-/*
- host: "ebayuserservice.cxbwjczjad93.ap-south-1.rds.amazonaws.com",
-    user: "devVishal",
-    database: "user_service",
-    password: "gQpIoXAx2B5V3V1b2XZz",
-    port: 5432,
-*/
 //# sourceMappingURL=DatabaseClient.js.map
