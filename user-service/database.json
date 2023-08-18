@@ -1,9 +1,0 @@
-{
-  "dev": {
-    "driver": "pg",
-    "user": "user_service",
-    "password": "user_service123",
-    "host": "ec2-65-2-190-10.ap-south-1.compute.amazonaws.com",
-    "database": "user_service"
-  }
-}
