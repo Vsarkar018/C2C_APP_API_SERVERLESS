@@ -5,7 +5,7 @@ import { StatusCodes } from "http-status-codes";
 import { CartRepository } from "../repository/cartRepository";
 import { VerifyToken } from "../utility/password";
 import { plainToClass } from "class-transformer";
-import { CartInput } from "../models/dto/CartInput";
+import { CartInput, UpdateCartInput } from "../models/dto/CartInput";
 import { AppValidationError } from "../utility/error";
 import { CartItemModel } from "../models/CartItemModel";
 import { PullData } from "../messageQueue";
@@ -80,12 +80,53 @@ export class CartService {
     }
   }
   async UpdateCart(event: APIGatewayProxyEventV2) {
-    return SuccessResponse({ message: "response from the Edit Cart" });
+    try {
+      const token = event.headers.authorization;
+      const payload = await VerifyToken(token);
+      if (!payload)
+        return ErrorResponse(StatusCodes.FORBIDDEN, "authorization failed");
+      const input = plainToClass(UpdateCartInput, event.body);
+      const error = await AppValidationError(input);
+      if (error) return ErrorResponse(StatusCodes.NOT_FOUND, error);
+      const cartItemId = Number(event.pathParameters.id);
+      const cartItems = await this.repository.updateCartItemById(
+        cartItemId,
+        input.qty
+      );
+      if (!cartItems) {
+        return ErrorResponse(StatusCodes.NOT_FOUND, "CartItem not found");
+      }
+      return SuccessResponse(cartItems);
+    } catch (error) {
+      console.log(error);
+      return ErrorResponse(StatusCodes.INTERNAL_SERVER_ERROR, error);
+    }
   }
   async GetCart(event: APIGatewayProxyEventV2) {
-    return SuccessResponse({ message: "response from the Get Cart" });
+    try {
+      const token = event.headers.authorization;
+      const payload = await VerifyToken(token);
+      if (!payload)
+        return ErrorResponse(StatusCodes.FORBIDDEN, "authorization failed");
+      const data = await this.repository.findCartItems(payload.user_id);
+      return SuccessResponse(data);
+    } catch (error) {
+      console.log(error);
+      return ErrorResponse(StatusCodes.INTERNAL_SERVER_ERROR, error);
+    }
   }
   async DeleteCart(event: APIGatewayProxyEventV2) {
-    return SuccessResponse({ message: "response from the delete Cart" });
+    try {
+      const token = event.headers.authorization;
+      const payload = await VerifyToken(token);
+      if (!payload)
+        return ErrorResponse(StatusCodes.FORBIDDEN, "authorization failed");
+      const cartItemId = Number(event.pathParameters.id);
+      const cartItems = await this.repository.deleteCartItem(cartItemId);
+      return SuccessResponse(cartItems);
+    } catch (error) {
+      console.log(error);
+      return ErrorResponse(StatusCodes.INTERNAL_SERVER_ERROR, error);
+    }
   }
 }

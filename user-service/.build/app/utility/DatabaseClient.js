@@ -13,12 +13,19 @@ exports.DBClient = void 0;
 const pg_1 = require("pg");
 const DBClient = () => __awaiter(void 0, void 0, void 0, function* () {
     return new pg_1.Client({
-        host: "127.0.0.1",
-        user: "postgres",
+        host: "ec2-65-2-190-10.ap-south-1.compute.amazonaws.com",
+        user: "user_service",
         database: "user_service",
-        password: "postgres",
+        password: "user_service123",
         port: 5432,
     });
 });
 exports.DBClient = DBClient;
+/*
+ host: "ebayuserservice.cxbwjczjad93.ap-south-1.rds.amazonaws.com",
+    user: "devVishal",
+    database: "user_service",
+    password: "gQpIoXAx2B5V3V1b2XZz",
+    port: 5432,
+*/
 //# sourceMappingURL=DatabaseClient.js.map

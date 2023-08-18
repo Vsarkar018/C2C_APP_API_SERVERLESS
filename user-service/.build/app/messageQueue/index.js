@@ -14,9 +14,10 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.PullData = void 0;
 const axios_1 = __importDefault(require("axios"));
-const PRODUCT_SERVICE_URL = "http://127.0.0.1:3000/products-queue";
+const PRODUCT_SERVICE_URL = "https://038bfl4o60.execute-api.ap-south-1.amazonaws.com/prod/products-queue";
+const PRODUCT_SERVICE_URL_LOCALHOST = "http://localhost:3000/products-queue";
 const PullData = (requestData) => __awaiter(void 0, void 0, void 0, function* () {
-    return axios_1.default.post(PRODUCT_SERVICE_URL, requestData);
+    return axios_1.default.post(PRODUCT_SERVICE_URL_LOCALHOST, requestData);
 });
 exports.PullData = PullData;
 //# sourceMappingURL=index.js.map

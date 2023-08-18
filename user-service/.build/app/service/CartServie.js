@@ -85,17 +85,59 @@ let CartService = exports.CartService = class CartService {
     }
     UpdateCart(event) {
         return __awaiter(this, void 0, void 0, function* () {
-            return (0, response_1.SuccessResponse)({ message: "response from the Edit Cart" });
+            try {
+                const token = event.headers.authorization;
+                const payload = yield (0, password_1.VerifyToken)(token);
+                if (!payload)
+                    return (0, response_1.ErrorResponse)(http_status_codes_1.StatusCodes.FORBIDDEN, "authorization failed");
+                const input = (0, class_transformer_1.plainToClass)(CartInput_1.UpdateCartInput, event.body);
+                const error = yield (0, error_1.AppValidationError)(input);
+                if (error)
+                    return (0, response_1.ErrorResponse)(http_status_codes_1.StatusCodes.NOT_FOUND, error);
+                const cartItemId = Number(event.pathParameters.id);
+                const cartItems = yield this.repository.updateCartItemById(cartItemId, input.qty);
+                if (!cartItems) {
+                    return (0, response_1.ErrorResponse)(http_status_codes_1.StatusCodes.NOT_FOUND, "CartItem not found");
+                }
+                return (0, response_1.SuccessResponse)(cartItems);
+            }
+            catch (error) {
+                console.log(error);
+                return (0, response_1.ErrorResponse)(http_status_codes_1.StatusCodes.INTERNAL_SERVER_ERROR, error);
+            }
         });
     }
     GetCart(event) {
         return __awaiter(this, void 0, void 0, function* () {
-            return (0, response_1.SuccessResponse)({ message: "response from the Get Cart" });
+            try {
+                const token = event.headers.authorization;
+                const payload = yield (0, password_1.VerifyToken)(token);
+                if (!payload)
+                    return (0, response_1.ErrorResponse)(http_status_codes_1.StatusCodes.FORBIDDEN, "authorization failed");
+                const data = yield this.repository.findCartItems(payload.user_id);
+                return (0, response_1.SuccessResponse)(data);
+            }
+            catch (error) {
+                console.log(error);
+                return (0, response_1.ErrorResponse)(http_status_codes_1.StatusCodes.INTERNAL_SERVER_ERROR, error);
+            }
         });
     }
     DeleteCart(event) {
         return __awaiter(this, void 0, void 0, function* () {
-            return (0, response_1.SuccessResponse)({ message: "response from the delete Cart" });
+            try {
+                const token = event.headers.authorization;
+                const payload = yield (0, password_1.VerifyToken)(token);
+                if (!payload)
+                    return (0, response_1.ErrorResponse)(http_status_codes_1.StatusCodes.FORBIDDEN, "authorization failed");
+                const cartItemId = Number(event.pathParameters.id);
+                const cartItems = yield this.repository.deleteCartItem(cartItemId);
+                return (0, response_1.SuccessResponse)(cartItems);
+            }
+            catch (error) {
+                console.log(error);
+                return (0, response_1.ErrorResponse)(http_status_codes_1.StatusCodes.INTERNAL_SERVER_ERROR, error);
+            }
         });
     }
 };

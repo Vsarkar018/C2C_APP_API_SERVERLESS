@@ -43,7 +43,20 @@ class CartRepository extends dbOperations_1.DBOperation {
         });
     }
     findCartItems(userId) {
-        return __awaiter(this, void 0, void 0, function* () { });
+        return __awaiter(this, void 0, void 0, function* () {
+            const queryString = `SELECT 
+      ci.cart_id ,
+      ci.item_id,
+      ci.product_id,
+      ci.name,
+      ci.price,
+      ci.item_qty,
+      ci.image_url,
+      ci.created_at FROM shopping_carts sc INNER JOIN cart_items ci ON sc.cart_id = ci.cart_id WHERE sc.user_id = $1`;
+            const values = [userId];
+            const result = yield this.executeQuery(queryString, values);
+            return result.rowCount > 0 ? result.rows : [];
+        });
     }
     findCartItemsByCartId(cartId) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -62,7 +75,12 @@ class CartRepository extends dbOperations_1.DBOperation {
         });
     }
     updateCartItemById(itemId, qty) {
-        return __awaiter(this, void 0, void 0, function* () { });
+        return __awaiter(this, void 0, void 0, function* () {
+            const queryString = "UPDATE cart_items SET item_qty=$1 WHERE item_id =$2 RETURNING *";
+            const values = [qty, itemId];
+            const result = yield this.executeQuery(queryString, values);
+            return result.rowCount > 0 ? result.rows[0] : false;
+        });
     }
     updateCartItemByProductId(productId, qty) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -73,7 +91,11 @@ class CartRepository extends dbOperations_1.DBOperation {
         });
     }
     deleteCartItem(id) {
-        return __awaiter(this, void 0, void 0, function* () { });
+        return __awaiter(this, void 0, void 0, function* () {
+            const queryString = "DELETE FROM cart_items WHERE item_id=$1";
+            const values = [id];
+            return this.executeQuery(queryString, values);
+        });
     }
 }
 exports.CartRepository = CartRepository;

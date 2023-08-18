@@ -1,9 +1,9 @@
 {
   "dev": {
     "driver": "pg",
-    "user": "postgres",
-    "password": "postgres",
-    "host": "127.0.0.1",
+    "user": "user_service",
+    "password": "user_service123",
+    "host": "ec2-65-2-190-10.ap-south-1.compute.amazonaws.com",
     "database": "user_service"
   }
 }

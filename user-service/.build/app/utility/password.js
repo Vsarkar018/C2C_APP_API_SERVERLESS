@@ -14,14 +14,14 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.VerifyToken = exports.GetToken = exports.ValidatePassaword = exports.GetHashedPassowrd = exports.GenSalt = void 0;
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
-const bcrypt_1 = __importDefault(require("bcrypt"));
+const bcryptjs_1 = __importDefault(require("bcryptjs"));
 const APP_SECRET = "my_32_bit_secret";
 const GenSalt = () => __awaiter(void 0, void 0, void 0, function* () {
-    return yield bcrypt_1.default.genSalt(10);
+    return yield bcryptjs_1.default.genSalt(10);
 });
 exports.GenSalt = GenSalt;
 const GetHashedPassowrd = (password, salt) => __awaiter(void 0, void 0, void 0, function* () {
-    return yield bcrypt_1.default.hash(password, salt);
+    return yield bcryptjs_1.default.hash(password, salt);
 });
 exports.GetHashedPassowrd = GetHashedPassowrd;
 const ValidatePassaword = (enteredPassword, savedPassword, salt) => __awaiter(void 0, void 0, void 0, function* () {

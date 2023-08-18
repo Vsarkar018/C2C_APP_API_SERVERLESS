@@ -27,7 +27,20 @@ export class CartRepository extends DBOperation {
     const result = await this.executeQuery(queryString, values);
     return result.rowCount > 0 ? (result.rows[0] as CartItemModel) : false;
   }
-  async findCartItems(userId: number) {}
+  async findCartItems(userId: number) {
+    const queryString = `SELECT 
+      ci.cart_id ,
+      ci.item_id,
+      ci.product_id,
+      ci.name,
+      ci.price,
+      ci.item_qty,
+      ci.image_url,
+      ci.created_at FROM shopping_carts sc INNER JOIN cart_items ci ON sc.cart_id = ci.cart_id WHERE sc.user_id = $1`;
+    const values = [userId];
+    const result = await this.executeQuery(queryString, values);
+    return result.rowCount > 0 ? (result.rows as CartItemModel[]) : [];
+  }
   async findCartItemsByCartId(cartId: number) {
     const queryString =
       "SELECT  product_id,name, image_url , price, item_qty  FROM cart_items WHERE cart_id = $1 ";
@@ -49,7 +62,13 @@ export class CartRepository extends DBOperation {
     const result = await this.executeQuery(queryString, values);
     return result.rowCount > 0 ? (result.rows[0] as CartItemModel) : false;
   }
-  async updateCartItemById(itemId: number, qty: number) {}
+  async updateCartItemById(itemId: number, qty: number) {
+    const queryString =
+      "UPDATE cart_items SET item_qty=$1 WHERE item_id =$2 RETURNING *";
+    const values = [qty, itemId];
+    const result = await this.executeQuery(queryString, values);
+    return result.rowCount > 0 ? (result.rows[0] as CartItemModel) : false;
+  }
   async updateCartItemByProductId(productId: string, qty: number) {
     const queryString =
       "UPDATE cart_items SET item_qty=$1 WHERE product_id =$2 RETURNING *";
@@ -57,5 +76,9 @@ export class CartRepository extends DBOperation {
     const result = await this.executeQuery(queryString, values);
     return result.rowCount > 0 ? (result.rows[0] as CartItemModel) : false;
   }
-  async deleteCartItem(id: number) {}
+  async deleteCartItem(id: number) {
+    const queryString = "DELETE FROM cart_items WHERE item_id=$1";
+    const values = [id];
+    return this.executeQuery(queryString, values);
+  }
 }
