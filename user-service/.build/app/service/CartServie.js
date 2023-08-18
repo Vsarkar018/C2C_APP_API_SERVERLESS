@@ -140,6 +140,21 @@ let CartService = exports.CartService = class CartService {
             }
         });
     }
+    CollectPayment(event) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                //Intiliaze payment gateway
+                //Autheticate payment confirmatain
+                //get cart items
+                //
+                return (0, response_1.SuccessResponse)({ message: "Hello from collect Payemt" });
+            }
+            catch (error) {
+                console.log(error);
+                return (0, response_1.ErrorResponse)(http_status_codes_1.StatusCodes.INTERNAL_SERVER_ERROR, error);
+            }
+        });
+    }
 };
 exports.CartService = CartService = __decorate([
     (0, tsyringe_1.autoInjectable)(),

@@ -129,4 +129,19 @@ export class CartService {
       return ErrorResponse(StatusCodes.INTERNAL_SERVER_ERROR, error);
     }
   }
+  async CollectPayment(event: APIGatewayProxyEventV2) {
+    try {
+      //Intiliaze payment gateway
+
+      //Autheticate payment confirmatain
+
+      //get cart items
+
+      //
+      return SuccessResponse({ message: "Hello from collect Payemt" });
+    } catch (error) {
+      console.log(error);
+      return ErrorResponse(StatusCodes.INTERNAL_SERVER_ERROR, error);
+    }
+  }
 }

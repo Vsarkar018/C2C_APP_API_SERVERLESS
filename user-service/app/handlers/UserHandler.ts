@@ -63,3 +63,7 @@ export const Cart = middy((event: APIGatewayProxyEventV2) => {
   }
   return cartService.ResponseWithError(event);
 }).use(jsonBodyParser());
+
+export const CollectPayment = middy((event: APIGatewayProxyEventV2) => {
+  return cartService.CollectPayment(event);
+}).use(jsonBodyParser());

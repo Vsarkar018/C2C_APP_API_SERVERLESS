@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.Cart = exports.Payment = exports.Profile = exports.Verify = exports.Login = exports.Signup = void 0;
+exports.CollectPayment = exports.Cart = exports.Payment = exports.Profile = exports.Verify = exports.Login = exports.Signup = void 0;
 const tsyringe_1 = require("tsyringe");
 const UserService_1 = require("../service/UserService");
 const core_1 = __importDefault(require("@middy/core"));
@@ -68,5 +68,8 @@ exports.Cart = (0, core_1.default)((event) => {
         return cartService.DeleteCart(event);
     }
     return cartService.ResponseWithError(event);
+}).use((0, http_json_body_parser_1.default)());
+exports.CollectPayment = (0, core_1.default)((event) => {
+    return cartService.CollectPayment(event);
 }).use((0, http_json_body_parser_1.default)());
 //# sourceMappingURL=UserHandler.js.map
