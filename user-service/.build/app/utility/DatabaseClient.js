@@ -13,10 +13,10 @@ exports.DBClient = void 0;
 const pg_1 = require("pg");
 const DBClient = () => __awaiter(void 0, void 0, void 0, function* () {
     return new pg_1.Client({
-        host: "ec2-65-2-190-10.ap-south-1.compute.amazonaws.com",
-        user: "user_service",
-        database: "user_service",
-        password: "user_service123",
+        host: process.env.PG_SELF_MANAGED_HOST,
+        user: process.env.PG_USER,
+        database: process.env.DB,
+        password: process.env.PG_SELF_MANAGED_PASS,
         port: 5432,
     });
 });

@@ -2,10 +2,10 @@ import { Client } from "pg";
 
 export const DBClient = async () => {
   return new Client({
-    host: "ec2-65-2-190-10.ap-south-1.compute.amazonaws.com",
-    user: "user_service",
-    database: "user_service",
-    password: "user_service123",
+    host: process.env.PG_SELF_MANAGED_HOST,
+    user: process.env.PG_USER,
+    database: process.env.DB,
+    password: process.env.PG_SELF_MANAGED_PASS,
     port: 5432,
   });
 };

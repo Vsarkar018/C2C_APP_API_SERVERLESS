@@ -9,6 +9,7 @@ const UserService_1 = require("../service/UserService");
 const core_1 = __importDefault(require("@middy/core"));
 const http_json_body_parser_1 = __importDefault(require("@middy/http-json-body-parser"));
 const CartServie_1 = require("../service/CartServie");
+require("dotenv/config");
 const userService = tsyringe_1.container.resolve(UserService_1.UserService);
 const cartService = tsyringe_1.container.resolve(CartServie_1.CartService);
 exports.Signup = (0, core_1.default)((event) => {

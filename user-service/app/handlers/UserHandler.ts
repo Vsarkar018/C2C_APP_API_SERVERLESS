@@ -4,6 +4,7 @@ import { UserService } from "../service/UserService";
 import middy from "@middy/core";
 import jsonBodyParser from "@middy/http-json-body-parser";
 import { CartService } from "../service/CartServie";
+import "dotenv/config";
 
 const userService = container.resolve(UserService);
 const cartService = container.resolve(CartService);
