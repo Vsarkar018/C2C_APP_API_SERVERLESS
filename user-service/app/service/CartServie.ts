@@ -9,19 +9,12 @@ import { CartInput, UpdateCartInput } from "../models/dto/CartInput";
 import { AppValidationError } from "../utility/error";
 import { CartItemModel } from "../models/CartItemModel";
 import { PullData } from "../messageQueue";
-
+import aws from "aws-sdk";
 @autoInjectable()
 export class CartService {
   repository: CartRepository;
   constructor(repository: CartRepository) {
     this.repository = repository;
-  }
-
-  async ResponseWithError(event: APIGatewayProxyEventV2) {
-    return ErrorResponse(
-      StatusCodes.NOT_FOUND,
-      "requested method is not supported"
-    );
   }
 
   //Cart Section
@@ -131,14 +124,34 @@ export class CartService {
   }
   async CollectPayment(event: APIGatewayProxyEventV2) {
     try {
+      const token = event.headers.authorization;
+      const payload = await VerifyToken(token);
       //Intiliaze payment gateway
 
       //Autheticate payment confirmatain
 
       //get cart items
 
-      //
-      return SuccessResponse({ message: "Hello from collect Payemt" });
+      if (!payload)
+        return ErrorResponse(StatusCodes.FORBIDDEN, "authorization failed");
+      const cartItems = await this.repository.findCartItems(payload.user_id);
+
+      //Send SNS topic to create order
+      const params = {
+        Message: JSON.stringify(cartItems),
+        TopicArn: process.env.SNS_TOPIC,
+        MessageAttributes: {
+          actionType: {
+            DataType: "String",
+            StringValue: "place_order",
+          },
+        },
+      };
+      const sns = new aws.SNS();
+      const response = await sns.publish(params).promise();
+
+      //Send tentative message to user
+      return SuccessResponse({ message: "Payment Processiing....", response });
     } catch (error) {
       console.log(error);
       return ErrorResponse(StatusCodes.INTERNAL_SERVER_ERROR, error);

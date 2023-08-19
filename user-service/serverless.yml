@@ -9,7 +9,14 @@ provider:
   region: "ap-south-1"
   httpApi:
     cors: true
-
+  environment:
+    SNS_TOPIC: { Ref: CustomerTopic }
+  iamRoleStatements:
+    - Effect: "Allow"
+      Action:
+        - "sns:Publish"
+      Resources:
+        - !Ref CustomerTopic
 custom:
   stage: "dev"
   serverless-offline:
@@ -21,70 +28,97 @@ functions:
     handler: app/handler.Signup
     events:
       - httpApi:
-          path: /user/signup
+          path: /signup
           method: post
   login:
     handler: app/handler.Login
     events:
       - httpApi:
-          path: /user/login
+          path: /login
           method: post
   verify:
     handler: app/handler.Verify
     events:
       - httpApi:
-          path: /user/verify
+          path: /verify
           method: post
-      - httpApi:
-          path: /user/verify
-          method: get
-  profile:
-    handler: app/handler.Profile
+  get-verification-code:
+    handler: app/handler.GetVerificationCode
     events:
       - httpApi:
-          path: /user/profile
-          method: post
-      - httpApi:
-          path: /user/profile
-          method: put
-      - httpApi:
-          path: /user/profile
+          path: /verify
           method: get
-  cart:
-    handler: app/handler.Cart
+  create-profile:
+    handler: app/handler.CreateProfile
+    events:
+      - httpApi:
+          path: /user
+          method: post
+  edit-profile:
+    handler: app/handler.EditProfile
+      - httpApi:
+          path: /user
+          method: put
+  get-profile:
+    handler: app/handler.GetProfile
+      - httpApi:
+          path: /user
+          method: get
+  create-cart:
+    handler: app/handler.CreateCart
     timeout: 15
     events:
       - httpApi:
-          path: /user/cart
+          path: /cart
           method: post
+  delete-cart:
+    handler: app/handler.DeleteCart
+    timeout: 15
       - httpApi:
-          path: /user/cart/{id}
-          method: put
-      - httpApi:
-          path: /user/cart
-          method: get
-      - httpApi:
-          path: /user/cart/{id}
+          path: /cart/{id}
           method: delete
-  payment:
-    handler: app/handler.Payment
-    events:
+  edit-cart:
+    handler: app/handler.EditCart
+    timeout: 15
       - httpApi:
-          path: /user/payment
-          method: post
-      - httpApi:
-          path: /user/payment
+          path: /cart/{id}
           method: put
+  get-cart:
+    handler: app/handler.GetCart
+    timeout: 15
       - httpApi:
-          path: /user/payment
+          path: /cart
           method: get
-  order:
+  collect-payment:
     handler: app/handler.CollectPayment
+    timeout: 15
     events:
       - httpApi:
-          path: /place-order
+          path: /collect-payment
+          method: post
+  create-order:
+    handler: app/handler.CreateOrder
+    timeout: 15
+    events:
+      - httpApi:
+          path: /order
           method: post
 
 plugins:
   - serverless-offline
   - serverless-plugin-typescript
+  - serverless-plugin-optimize
+
+resources:
+  Resources:
+    CustomerTopic:
+      Type: AWS::SNS::Topic
+      Properties:
+        DisplayName: "customer sns topic description"
+        TopicName: CustomerTopic
+  Outputs:
+    CustomerTopicInfo:
+      Description: customer-topic
+      value: !Ref CustomerTopic
+      Export:
+        Name: customer-topic

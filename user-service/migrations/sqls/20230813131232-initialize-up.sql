@@ -10,6 +10,8 @@ CREATE TABLE "users"(
     "profile_pic" text,
     "verification_code" integer,
     "expiry" timestamptz,
+    "stripe_id" varchar ,
+    "payment_id" varchar,
     "verified" boolean NOT NULL DEFAULT FALSE,
     "created_at" timestamptz NOT NULL DEFAULT (now())
 );
