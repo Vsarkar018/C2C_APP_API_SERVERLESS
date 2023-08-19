@@ -6,16 +6,17 @@ provider:
   runtime: nodejs18.x
   versionFunctions: false
   stage: "dev"
-  region: "ap-south-1"
+  region: ap-south-1
   httpApi:
     cors: true
+  # SNS Topic
   environment:
     SNS_TOPIC: { Ref: CustomerTopic }
   iamRoleStatements:
     - Effect: "Allow"
       Action:
         - "sns:Publish"
-      Resources:
+      Resource:
         - !Ref CustomerTopic
 custom:
   stage: "dev"
@@ -25,7 +26,7 @@ custom:
 
 functions:
   signup:
-    handler: app/handler.Signup
+    handler: app/handler.SignUp
     events:
       - httpApi:
           path: /signup
@@ -56,49 +57,56 @@ functions:
           method: post
   edit-profile:
     handler: app/handler.EditProfile
+    events:
       - httpApi:
           path: /user
           method: put
   get-profile:
     handler: app/handler.GetProfile
+    events:
       - httpApi:
           path: /user
           method: get
+  # Cart Section
   create-cart:
     handler: app/handler.CreateCart
-    timeout: 15
+    timeout: 20
     events:
       - httpApi:
           path: /cart
           method: post
-  delete-cart:
-    handler: app/handler.DeleteCart
-    timeout: 15
-      - httpApi:
-          path: /cart/{id}
-          method: delete
   edit-cart:
     handler: app/handler.EditCart
-    timeout: 15
+    timeout: 20
+    events:
       - httpApi:
           path: /cart/{id}
           method: put
   get-cart:
     handler: app/handler.GetCart
-    timeout: 15
+    timeout: 20
+    events:
       - httpApi:
           path: /cart
           method: get
+  delete-cart:
+    handler: app/handler.DeleteCart
+    timeout: 20
+    events:
+      - httpApi:
+          path: /cart/{id}
+          method: delete
   collect-payment:
     handler: app/handler.CollectPayment
-    timeout: 15
+    timeout: 20
     events:
       - httpApi:
           path: /collect-payment
           method: post
+
   create-order:
     handler: app/handler.CreateOrder
-    timeout: 15
+    timeout: 20
     events:
       - httpApi:
           path: /order
@@ -107,7 +115,7 @@ functions:
 plugins:
   - serverless-offline
   - serverless-plugin-typescript
-  - serverless-plugin-optimize
+  # - serverless-plugin-optimize
 
 resources:
   Resources:

@@ -13,7 +13,15 @@ var __createBinding = (this && this.__createBinding) || (Object.create ? (functi
 var __exportStar = (this && this.__exportStar) || function(m, exports) {
     for (var p in m) if (p !== "default" && !Object.prototype.hasOwnProperty.call(exports, p)) __createBinding(exports, m, p);
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 require("reflect-metadata");
+const dotenv_1 = __importDefault(require("dotenv"));
+dotenv_1.default.config();
 __exportStar(require("./handlers/UserHandler"), exports);
+__exportStar(require("./handlers/CartHandler"), exports);
+__exportStar(require("./handlers/PaymentHandler"), exports);
+__exportStar(require("./handlers/OrderHandler"), exports);
 //# sourceMappingURL=handler.js.map

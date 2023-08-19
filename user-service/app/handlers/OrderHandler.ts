@@ -1,5 +1,5 @@
 import middy from "@middy/core";
-import { CartService } from "app/service/CartServie";
+import { CartService } from "../service/CartService";
 import { APIGatewayProxyEventV2 } from "aws-lambda";
 import { container } from "tsyringe";
 
