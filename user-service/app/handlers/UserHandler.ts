@@ -1,9 +1,10 @@
-import { container } from "tsyringe";
+
 import { APIGatewayProxyEventV2 } from "aws-lambda";
 import { UserService } from "../service/UserService";
 import middy from "@middy/core";
 import jsonBodyParser from "@middy/http-json-body-parser";
-const userService = container.resolve(UserService);
+import { UserRepository } from "../repository/UserRepository";
+const userService = new UserService(new UserRepository())
 
 export const Signup = middy((event: APIGatewayProxyEventV2) => {
   return userService.CreateUser(event);

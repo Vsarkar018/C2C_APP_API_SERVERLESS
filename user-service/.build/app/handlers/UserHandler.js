@@ -4,11 +4,11 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.GetProfile = exports.EditProfile = exports.CreateProfile = exports.GetVerificationCode = exports.Verify = exports.Login = exports.Signup = void 0;
-const tsyringe_1 = require("tsyringe");
 const UserService_1 = require("../service/UserService");
 const core_1 = __importDefault(require("@middy/core"));
 const http_json_body_parser_1 = __importDefault(require("@middy/http-json-body-parser"));
-const userService = tsyringe_1.container.resolve(UserService_1.UserService);
+const UserRepository_1 = require("../repository/UserRepository");
+const userService = new UserService_1.UserService(new UserRepository_1.UserRepository());
 exports.Signup = (0, core_1.default)((event) => {
     return userService.CreateUser(event);
 }).use((0, http_json_body_parser_1.default)());

@@ -1,13 +1,4 @@
 "use strict";
-var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
-    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-    return c > 3 && r && Object.defineProperty(target, key, r), r;
-};
-var __metadata = (this && this.__metadata) || function (k, v) {
-    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
-};
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -20,8 +11,6 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.UserService = void 0;
 const response_1 = require("../utility/response");
-const UserRepository_1 = require("../repository/UserRepository");
-const tsyringe_1 = require("tsyringe");
 const class_transformer_1 = require("class-transformer");
 const SignupInput_1 = require("../models/dto/SignupInput");
 const error_1 = require("../utility/error");
@@ -32,7 +21,7 @@ const Notification_1 = require("../utility/Notification");
 const UpdateInput_1 = require("../models/dto/UpdateInput");
 const DateHelper_1 = require("../DateHelper");
 const AddressInput_1 = require("../models/dto/AddressInput");
-let UserService = exports.UserService = class UserService {
+class UserService {
     constructor(repository) {
         this.repository = repository;
     }
@@ -220,9 +209,6 @@ let UserService = exports.UserService = class UserService {
             });
         });
     }
-};
-exports.UserService = UserService = __decorate([
-    (0, tsyringe_1.autoInjectable)(),
-    __metadata("design:paramtypes", [UserRepository_1.UserRepository])
-], UserService);
+}
+exports.UserService = UserService;
 //# sourceMappingURL=UserService.js.map

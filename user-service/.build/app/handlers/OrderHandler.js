@@ -6,8 +6,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.CollectPayment = void 0;
 const core_1 = __importDefault(require("@middy/core"));
 const CartService_1 = require("../service/CartService");
-const tsyringe_1 = require("tsyringe");
-const cartService = tsyringe_1.container.resolve(CartService_1.CartService);
+const cartRepository_1 = require("app/repository/cartRepository");
+const cartService = new CartService_1.CartService(new cartRepository_1.CartRepository());
 exports.CollectPayment = (0, core_1.default)((event) => {
     return cartService.CollectPayment(event);
 });

@@ -1,6 +1,5 @@
 import { ErrorResponse, SuccessResponse } from "../utility/response";
 import { APIGatewayProxyEventV2 } from "aws-lambda";
-import { autoInjectable } from "tsyringe";
 import { StatusCodes } from "http-status-codes";
 import { CartRepository } from "../repository/cartRepository";
 import { VerifyToken } from "../utility/password";
@@ -10,7 +9,6 @@ import { AppValidationError } from "../utility/error";
 import { CartItemModel } from "../models/CartItemModel";
 import { PullData } from "../messageQueue";
 import aws from "aws-sdk";
-@autoInjectable()
 export class CartService {
   repository: CartRepository;
   constructor(repository: CartRepository) {
