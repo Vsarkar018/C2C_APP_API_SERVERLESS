@@ -11,6 +11,10 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
+    "@types/aws-lambda": "^8.10.119",
+    "@types/bcryptjs": "^2.4.2",
+    "@types/jsonwebtoken": "^9.0.2",
+    "@types/pg": "^8.10.2",
     "serverless-offline": "^12.0.4",
     "serverless-plugin-include-dependencies": "^5.1.0",
     "serverless-plugin-optimize": "^4.2.1-rc.1",
@@ -19,10 +23,6 @@
   "dependencies": {
     "@middy/core": "^4.5.5",
     "@middy/http-json-body-parser": "^4.5.5",
-    "@types/aws-lambda": "^8.10.119",
-    "@types/bcryptjs": "^2.4.2",
-    "@types/jsonwebtoken": "^9.0.2",
-    "@types/pg": "^8.10.2",
     "aws-lambda": "^1.0.7",
     "aws-sdk": "^2.1440.0",
     "axios": "^1.4.0",

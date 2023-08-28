@@ -3,13 +3,13 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.GetProfile = exports.EditProfile = exports.CreateProfile = exports.GetVerificationCode = exports.Verify = exports.Login = exports.Signup = void 0;
+exports.GetProfile = exports.EditProfile = exports.CreateProfile = exports.GetVerificationCode = exports.Verify = exports.Login = exports.SignUp = void 0;
 const UserService_1 = require("../service/UserService");
 const core_1 = __importDefault(require("@middy/core"));
 const http_json_body_parser_1 = __importDefault(require("@middy/http-json-body-parser"));
 const UserRepository_1 = require("../repository/UserRepository");
 const userService = new UserService_1.UserService(new UserRepository_1.UserRepository());
-exports.Signup = (0, core_1.default)((event) => {
+exports.SignUp = (0, core_1.default)((event) => {
     return userService.CreateUser(event);
 }).use((0, http_json_body_parser_1.default)());
 exports.Login = (0, core_1.default)((event) => {

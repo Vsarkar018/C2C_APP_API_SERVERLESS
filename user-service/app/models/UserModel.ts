@@ -13,4 +13,6 @@ export interface UserModel {
   expiry?: string;
   profile_pic?: string;
   address?: AddressModel[];
+  stripe_id?:string;
+  payment_id?:string;
 }

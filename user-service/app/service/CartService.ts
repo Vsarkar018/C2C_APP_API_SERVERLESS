@@ -8,7 +8,14 @@ import { CartInput, UpdateCartInput } from "../models/dto/CartInput";
 import { AppValidationError } from "../utility/error";
 import { CartItemModel } from "../models/CartItemModel";
 import { PullData } from "../messageQueue";
+import { UserRepository } from "../repository/UserRepository";
 import aws from "aws-sdk";
+import {
+  APPLICATION_FEE,
+  CreatePaymentSession,
+  RetrievePayment,
+  STRIPE_FEE,
+} from "../utility/Payment";
 export class CartService {
   repository: CartRepository;
   constructor(repository: CartRepository) {
@@ -99,8 +106,17 @@ export class CartService {
       const payload = await VerifyToken(token);
       if (!payload)
         return ErrorResponse(StatusCodes.FORBIDDEN, "authorization failed");
-      const data = await this.repository.findCartItems(payload.user_id);
-      return SuccessResponse(data);
+      const cartItems = await this.repository.findCartItems(payload.user_id);
+      const amount = cartItems.reduce(
+        (sum, item) => sum + item.price * item.item_qty,
+        0
+      );
+      const appFee = APPLICATION_FEE(amount);
+      const stripeFee = STRIPE_FEE(amount);
+
+      const totalAmount = amount + appFee + stripeFee;
+
+      return SuccessResponse({ cartItems, totalAmount, appFee });
     } catch (error) {
       console.log(error);
       return ErrorResponse(StatusCodes.INTERNAL_SERVER_ERROR, error);
@@ -124,32 +140,77 @@ export class CartService {
     try {
       const token = event.headers.authorization;
       const payload = await VerifyToken(token);
-      //Intiliaze payment gateway
+      if (!payload)
+        return ErrorResponse(StatusCodes.FORBIDDEN, "authorization failed");
+      const { stripe_id, email, phone } =
+        await new UserRepository().getUserProfile(payload.user_id);
+      const cartItems = await this.repository.findCartItems(payload.user_id);
+      const totalAmout = cartItems.reduce(
+        (sum, item) => sum + item.price * item.item_qty,
+        0
+      );
+      const appFee = APPLICATION_FEE(totalAmout);
+      const stripeFee = STRIPE_FEE(totalAmout);
 
+      const amount = totalAmout + appFee + stripeFee;
+
+      //Intiliaze payment gateway
+      const { customerId, paymentId, publishableKey, secret } =
+        await CreatePaymentSession({
+          email,
+          phone,
+          customerId: stripe_id,
+          amount,
+        });
+      await new UserRepository().updateUserPayment({
+        userId: payload.user_id,
+        customerId,
+        paymentId,
+      });
       //Autheticate payment confirmatain
 
       //get cart items
 
+      return SuccessResponse({ secret, publishableKey });
+    } catch (error) {
+      console.log(error);
+      return ErrorResponse(StatusCodes.INTERNAL_SERVER_ERROR, error);
+    }
+  }
+  async PlaceOrder(event: APIGatewayProxyEventV2) {
+    try {
+      const token = event.headers.authorization;
+      const payload = await VerifyToken(token);
       if (!payload)
         return ErrorResponse(StatusCodes.FORBIDDEN, "authorization failed");
-      const cartItems = await this.repository.findCartItems(payload.user_id);
+      const { payment_id } = await new UserRepository().getUserProfile(
+        payload.user_id
+      );
+      const paymentInfo = await RetrievePayment(payment_id);
+      if (paymentInfo.status === "succeeded") {
+        // const cartItems = await this.repository.findCartItems(payload.user_id);
 
-      //Send SNS topic to create order
-      const params = {
-        Message: JSON.stringify(cartItems),
-        TopicArn: process.env.SNS_TOPIC,
-        MessageAttributes: {
-          actionType: {
-            DataType: "String",
-            StringValue: "place_order",
-          },
-        },
-      };
-      const sns = new aws.SNS();
-      const response = await sns.publish(params).promise();
+        // const params = {
+        //   Message: JSON.stringify(cartItems),
+        //   TopicArn: process.env.SNS_TOPIC,
+        //   MessageAtrributes: {
+        //     actionType: {
+        //       DataTypes: "String",
+        //       StringValue: "place_order",
+        //     },
+        //   },
+        // };
+        // const sns = new aws.SNS();
+        // const response = await sns.publish(params).promise();
+        // console.log(response);
 
-      //Send tentative message to user
-      return SuccessResponse({ message: "Payment Processiing....", response });
+        return SuccessResponse({
+          message: "Payment Successfully Initialized",
+          paymentInfo,
+        });
+      }
+      console.log(paymentInfo);
+      return ErrorResponse(StatusCodes.BAD_GATEWAY, "something went wrong");
     } catch (error) {
       console.log(error);
       return ErrorResponse(StatusCodes.INTERNAL_SERVER_ERROR, error);

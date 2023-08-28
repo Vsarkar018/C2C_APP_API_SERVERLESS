@@ -4,6 +4,7 @@
   "description": "<!-- title: 'AWS Simple HTTP Endpoint example in NodeJS' description: 'This template demonstrates how to make a simple HTTP API with Node.js running on AWS Lambda and API Gateway using the Serverless Framework.' layout: Doc framework: v3 platform: AWS language: nodeJS authorLink: 'https://github.com/serverless' authorName: 'Serverless, inc.' authorAvatar: 'https://avatars1.githubusercontent.com/u/13742415?s=200&v=4' -->",
   "main": "index.js",
   "scripts": {
+    "test": "serverless-bundle test",
     "dev": "serverless offline",
     "deploy": "sls deploy --verbose"
   },
@@ -11,6 +12,11 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
+    "@types/aws-lambda": "^8.10.119",
+    "@types/bcryptjs": "^2.4.2",
+    "@types/jsonwebtoken": "^9.0.2",
+    "@types/pg": "^8.10.2",
+    "serverless-bundle": "^6.0.0",
     "serverless-offline": "^12.0.4",
     "serverless-plugin-include-dependencies": "^5.1.0",
     "serverless-plugin-optimize": "^4.2.1-rc.1",
@@ -19,10 +25,6 @@
   "dependencies": {
     "@middy/core": "^4.5.5",
     "@middy/http-json-body-parser": "^4.5.5",
-    "@types/aws-lambda": "^8.10.119",
-    "@types/bcryptjs": "^2.4.2",
-    "@types/jsonwebtoken": "^9.0.2",
-    "@types/pg": "^8.10.2",
     "aws-lambda": "^1.0.7",
     "aws-sdk": "^2.1440.0",
     "axios": "^1.4.0",
@@ -39,6 +41,7 @@
     "pg": "^8.11.2",
     "reflect-metadata": "^0.1.13",
     "serverless": "^3.34.0",
+    "stripe": "^13.3.0",
     "ts-node": "^10.9.1",
     "tsyringe": "^4.8.0",
     "twilio": "^4.14.1",

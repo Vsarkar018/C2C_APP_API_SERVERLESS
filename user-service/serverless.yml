@@ -109,7 +109,7 @@ functions:
           method: post
 
   create-order:
-    handler: app/handler.CreateOrder
+    handler: app/handler.PlaceOrder
     timeout: 20
     events:
       - httpApi:
@@ -120,7 +120,8 @@ plugins:
   - serverless-offline
   - serverless-plugin-typescript
   - serverless-plugin-optimize
-  - serverless-plugin-include-dependencies
+  - serverless-bundle
+  # - serverless-plugin-include-dependencies
 
 package:
   individually: true

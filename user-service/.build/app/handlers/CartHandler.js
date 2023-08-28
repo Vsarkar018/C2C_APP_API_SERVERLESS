@@ -7,7 +7,7 @@ exports.GetCart = exports.EditCart = exports.DeleteCart = exports.CreateCart = v
 const core_1 = __importDefault(require("@middy/core"));
 const http_json_body_parser_1 = __importDefault(require("@middy/http-json-body-parser"));
 const CartService_1 = require("../service/CartService");
-const cartRepository_1 = require("app/repository/cartRepository");
+const cartRepository_1 = require("../repository/cartRepository");
 const cartService = new CartService_1.CartService(new cartRepository_1.CartRepository());
 exports.CreateCart = (0, core_1.default)((event) => {
     return cartService.CreateCart(event);

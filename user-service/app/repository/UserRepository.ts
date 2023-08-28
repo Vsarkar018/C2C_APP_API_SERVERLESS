@@ -91,7 +91,7 @@ export class UserRepository extends DBOperation {
   }
   async getUserProfile(userId: number) {
     const profileQueryString =
-      "SELECT first_name, last_name , email , phone , user_type, verified FROM users WHERE user_id=$1";
+      "SELECT first_name, last_name , email , phone , user_type, verified ,stripe_id , payment_id FROM users WHERE user_id=$1";
     const values = [userId];
     const profileResult = await this.executeQuery(profileQueryString, values);
     if (profileResult.rowCount < 1) {
@@ -112,24 +112,36 @@ export class UserRepository extends DBOperation {
       first_name,
       last_name,
       user_type,
-      address: { address_line1, address_line2, city, postCode, country,id },
+      address: { address_line1, address_line2, city, postCode, country, id },
     }: ProfileInput
   ) {
     await this.updateUser(userId, first_name, last_name, user_type);
     const queryString =
       "UPDATE address SET address_line1=$1,address_line2=$2, city=$3 , post_code=$4 , country=$5 WHERE id=$6";
-    const values = [
-      address_line1,
-      address_line2,
-      city,
-      postCode,
-      country,
-      id,
-    ];
+    const values = [address_line1, address_line2, city, postCode, country, id];
     const result = await this.executeQuery(queryString, values);
     if (result.rowCount < 1) {
       throw new Error("error while updating  Profile");
     }
     return true;
+  }
+
+  async updateUserPayment({
+    userId,
+    paymentId,
+    customerId,
+  }: {
+    userId: number;
+    paymentId: string;
+    customerId: string;
+  }) {
+    const queryString =
+      "UPDATE users SET stripe_id=$1, payment_id=$2  WHERE user_id=$3  RETURNING *";
+    const values = [customerId, paymentId, userId];
+    const result = await this.executeQuery(queryString, values);
+    if (result.rowCount > 0) {
+      return result.rows[0] as UserModel;
+    }
+    throw new Error("Error while updating user payment");
   }
 }
